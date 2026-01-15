@@ -1,31 +1,24 @@
-import time
+# fix_pyrogram.py
+import asyncio
+import sys
 
-from platform import python_version
+def fix_pyrogram_event_loop():
+    """Fix Pyrogram's event loop issue in Python 3.10+"""
+    # Method 1: Try to get existing loop
+    try:
+        loop = asyncio.get_event_loop()
+        return loop
+    except RuntimeError:
+        pass
+    
+    # Method 2: Create new loop for main thread
+    if sys.platform == "win32":
+        # Windows needs special handling
+        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+    
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    return loop
 
-from SpamX.functions.database import dataBase
-from SpamX.config import PING_MSG
-
-from pyrogram import __version__
-
-
-# --- start time --- #
-StartTime = time.time()
-
-# --- versions --- #
-version = {
-    "SpamX": "v2.0",
-    "pyrogram": __version__,
-    "python": python_version(),
-}
-
-UpdateChannel = "RiZoeL_X"
-SupportGroup = "RiZoeLXSupport"
-
-activeTasks: dict = {}
-dataBase = dataBase
-
-#  --- etx
-if PING_MSG:
-    pingMSG = str(PING_MSG)
-else:
-    pingMSG = "SpamX"
+# Apply fix immediately
+fix_pyrogram_event_loop()
